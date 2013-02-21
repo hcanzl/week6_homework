@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+require 'test_gem'
+
+puts "test_gem script executing"
+puts "argument is: #{ARGV[0]}"
+
+case ARGV[0]
+when '--init'
+  puts 'Initializing configuration file config.yml'
+  TestGem::MyFile.init_config
+  
+when nil
+  puts 'Modifying configuration file config.yml'
+  TestGem::MyFile.configure({ :default_file_name => 'config.yml' })
+  
+else
+  puts "#{ARGV[0]} is an Invalid Argument."
+  
+end
