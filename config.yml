@@ -1,0 +1,5 @@
+---
+:default_file_name: default_file.txt
+:supported_types:
+- txt
+- pdf

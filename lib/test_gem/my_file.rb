@@ -17,24 +17,28 @@ module TestGem
       f.readlines[-1].chomp
     end
     
-    def self.init_config
-      config_file = File.open('config.yml', 'w')
-      YAML.dump({ :default_file_name => 'default_file.txt', :supported_types => ['txt', 'pdf'] }, config_file)
-      config_file.close
+    def self.init_config filename
+      default_config = { :default_file_name => 'default_file.txt', :supported_types => ['txt', 'pdf'] }
+      
+      File.open(filename, 'w') { |config_file| YAML.dump(default_config, config_file) }
+      
     end
     
-    def self.configure new_config_hash 
-      raise ConfigFileMissing unless File.exists?('config.yml')
-      
-      current_config = File.open('config.yml', 'r') { |config_file| YAML.load(config_file)}
-   
-      new_config_hash.each { |key, value|
-        current_config[key] = value
+    def self.read_config filename
+      raise ConfigFileMissing unless File.exists?(filename)
+            
+      File.open(filename, 'r') { |config_file| YAML.load(config_file) }
+    end
+    
+    def self.configure config_hash
+      config_str = ""
+      config_str.concat("Configuration Values:\n")
+      config_hash.each { |key, value|
+        config_str.concat("#{ key } = #{ value }\n")
       }
       
-      config_file = File.open('config.yml', 'w')
-      YAML.dump(current_config, config_file)
-      config_file.close
+      puts config_str
+      return config_str
     end
     
   end

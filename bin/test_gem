@@ -1,18 +1,18 @@
 #!/usr/bin/env ruby
 
 require 'test_gem'
-
+TEST_CONFIG_FILE = 'test_config.yml'
 puts "test_gem script executing"
-puts "argument is: #{ARGV[0]}"
+puts "argument is: #{ARGV[0]}\n\n"
 
 case ARGV[0]
 when '--init'
-  puts 'Initializing configuration file config.yml'
-  TestGem::MyFile.init_config
+  puts "***Initializing configuration file config.yml***"
+  TestGem::MyFile.init_config TEST_CONFIG_FILE
   
 when nil
-  puts 'Modifying configuration file config.yml'
-  TestGem::MyFile.configure({ :default_file_name => 'config.yml' })
+  puts "\n***Reading configuration file #{ TEST_CONFIG_FILE }***\n"
+  TestGem::MyFile.configure(TestGem::MyFile.read_config(TEST_CONFIG_FILE))
   
 else
   puts "#{ARGV[0]} is an Invalid Argument."

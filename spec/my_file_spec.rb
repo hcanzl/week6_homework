@@ -5,6 +5,8 @@ require 'test_gem'
 
 describe TestGem::MyFile do
   
+  FILENAME = 'config.yml'
+  
   it { TestGem.should be_a Module }
   
   it "::first returns the first line of file" do
@@ -18,30 +20,34 @@ describe TestGem::MyFile do
   end
    
   it "::init_config write a default config file to current directory in YAML" do
-    TestGem::MyFile.init_config
+    TestGem::MyFile.init_config FILENAME
 
-    File.exist?('config.yml').should eq true
+    File.exist?(FILENAME).should eq true
   end
-  
-  it '::configure should raise a ConfigFileMissing when config file is missing' do
-    if (File.exists?('config.yml'))
-       File.delete('config.yml')
+
+  it "::read_config raise ConfigFileMissing exception when config file is missing" do
+    if (File.exists?(FILENAME))
+       File.delete(FILENAME)
     end
     
-    expect{ TestGem::MyFile.configure( { :default_file_name => 'config.yml' }) }.to raise_error(ConfigFileMissing)
+    expect{ TestGem::MyFile.read_config FILENAME}.to raise_error(ConfigFileMissing)
   end
+  
+  it "::read_config dump configuration file content to a hash and returns it" do
+    expected_config_hash = { :default_file_name => 'default_file.txt', :supported_types => ['txt', 'pdf'] }
+    TestGem::MyFile.init_config FILENAME
     
-  it "::configure set @default_file_name and @supported_types from config hash" do
-    TestGem::MyFile.init_config
-    file = 'config.yml'
-    types = ['txt', 'pdf', 'csv']
-
-    TestGem::MyFile.configure({ :default_file_name => file })
-    TestGem::MyFile.configure({ :supported_types => ['txt', 'pdf', 'csv'] })
-    config_hash = File.open('config.yml', 'r') { |config_file| YAML.load(config_file) }
-
-    config_hash[:default_file_name].should eq file
-    config_hash[:supported_types].should eq types
+    TestGem::MyFile.read_config(FILENAME).should eq expected_config_hash
+  end
+   
+  it "::configure displays configuration file content" do
+    expected_config_string = "Configuration Values:\ndefault_file_name = default_file.txt\n" \
+                              + "supported_types = [\"txt\", \"pdf\"]\n"
+    
+    TestGem::MyFile.init_config FILENAME 
+    printed_config = TestGem::MyFile.configure(TestGem::MyFile.read_config FILENAME)
+    
+    printed_config.should eq expected_config_string
   end
   
 end
